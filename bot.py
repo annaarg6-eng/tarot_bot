@@ -6,7 +6,17 @@ from datetime import date
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiohttp import web
+import threading
 
+def run_web():
+    async def handle(request):
+        return web.Response(text="OK")
+    app = web.Application()
+    app.router.add_get("/", handle)
+    web.run_app(app, port=8080)
+
+threading.Thread(target=run_web, daemon=True).start()
 # ============================================================
 #  ТОКЕН — вставь свой от BotFather
 # ============================================================
