@@ -14,7 +14,8 @@ def run_web():
         return web.Response(text="OK")
     app = web.Application()
     app.router.add_get("/", handle)
-    web.run_app(app, port=8080)
+    port = int(os.environ.get("PORT", 8080))
+    web.run_app(app, host="0.0.0.0", port=port)
 
 threading.Thread(target=run_web, daemon=True).start()
 # ============================================================
