@@ -646,19 +646,41 @@ def format_card(card: dict, reversed: bool, show_advice: bool = True) -> str:
 # ============================================================
 #  ХЭНДЛЕРЫ
 # ============================================================
+USERS_FILE = "users.txt"
+
 @dp.message(Command("start"))
 async def start(message: types.Message):
+    # сохраняем пользователя
+    user_id = str(message.from_user.id)
+    users = set()
+    if os.path.exists(USERS_FILE):
+        with open(USERS_FILE) as f:
+            users = set(f.read().splitlines())
+    users.add(user_id)
+    with open(USERS_FILE, "w") as f:
+        f.write("\n".join(users))
+
     name = message.from_user.first_name or "странник"
     await message.answer(
         f"🔮 Добро пожаловать, *{name}*!\n\n"
         "Здесь ты можешь вытащить *карту дня* — один раз в сутки.\n"
         "Карта покажет тебе энергию дня и даст личный совет.\n\n"
-        "Также доступны расклады на *3 и 5 карт* — прошлое, настоящее, будущее и глубже.\n\n"
+        "Также доступны расклады на *3 и 5 карт*.\n\n"
         "Выбери действие в меню 👇",
         parse_mode="Markdown",
         reply_markup=main_menu
     )
+MY_ID = 799568725  # замени на свой Telegram ID
 
+@dp.message(Command("stats"))
+async def stats(message: types.Message):
+    if message.from_user.id != MY_ID:
+        return
+    users = set()
+    if os.path.exists(USERS_FILE):
+        with open(USERS_FILE) as f:
+            users = set(f.read().splitlines())
+    await message.answer(f"👥 Всего пользователей: {len(users)}")
 @dp.message(F.text == "🃏 Карта дня")
 async def card_of_the_day(message: types.Message):
     user_id = message.from_user.id
