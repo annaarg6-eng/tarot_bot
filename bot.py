@@ -1,3 +1,4 @@
+from aiohttp import web
 import asyncio
 import random
 import json
@@ -6,20 +7,8 @@ from datetime import date
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-from aiohttp import web
-import threading
 import asyncio
 
-async def run_web():
-    async def handle(request):
-        return web.Response(text="OK")
-    app = web.Application()
-    app.router.add_get("/", handle)
-    runner = web.AppRunner(app)
-    await runner.setup()
-    port = int(os.environ.get("PORT", 10000))
-    site = web.TCPSite(runner, "0.0.0.0", port)
-    await site.start()
 # ============================================================
 #  ТОКЕН — вставь свой от BotFather
 # ============================================================
@@ -755,7 +744,18 @@ async def about(message: types.Message):
 #  ЗАПУСК
 # ============================================================
 async def main():
-    await run_web()
+    # запускаем веб-сервер
+    async def handle(request):
+        return web.Response(text="OK")
+
+    app = web.Application()
+    app.router.add_get("/", handle)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    port = int(os.environ.get("PORT", 10000))
+    site = web.TCPSite(runner, "0.0.0.0", port)
+    await site.start()
+
     print("✨ Таро-бот запущен!")
     await dp.start_polling(bot)
 
